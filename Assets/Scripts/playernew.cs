@@ -18,6 +18,7 @@ namespace Player
         public float backSpeed = 5f;
         public float runBoost = 5f;
         public float rotationSpeed = 100f;
+        public float jumpSpeed = 8f;
         float currentSpeed;
 
         bool isWalking = false;
