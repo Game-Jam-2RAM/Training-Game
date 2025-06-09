@@ -20,10 +20,14 @@ namespace Player
         public float rotationSpeed = 100f;
         public float jumpSpeed = 8f;
         float currentSpeed;
+        
+        float jumpBufferTime = 0.2f;
+        float jumpBufferCounter = 0f;
 
         bool isWalking = false;
         bool isWalkingBack = false;
         bool isRotating = false;
+        bool isJumping = false;
 
         void Start()
         {
@@ -37,6 +41,20 @@ namespace Player
         {
             HandleRotation();
             HandleAnimation();
+            if ((Input.GetKeyDown(KeyCode.Space) && isWalking) || (Input.GetKeyDown(KeyCode.Space) && !isWalking && !isWalkingBack && !isRotating))
+            {
+                jumpBufferCounter = jumpBufferTime; // start buffer timer
+            }
+            else
+            {
+                jumpBufferCounter -= Time.deltaTime;
+            }
+            if (isJumping && controller.isGrounded && moveDirection.y <= 0f)
+            {
+                isJumping = false;
+            }
+
+
         }
 
         void FixedUpdate()
@@ -44,29 +62,70 @@ namespace Player
             HandleMovement();
         }
 
+
         void HandleMovement()
         {
-            moveDirection = Vector3.zero;
+            // Reset x and z movement
+            Vector3 horizontalMove = Vector3.zero;
+
+            // Allow forward and backward movement only when grounded
+            if (controller.isGrounded)
+            {
+                // Grounded movement
+                if (Input.GetKey(KeyCode.W))
+                    horizontalMove = transform.forward * currentSpeed;
+                else if (Input.GetKey(KeyCode.S))
+                    horizontalMove = -transform.forward * backSpeed;
+
+                // Jump
+                if (jumpBufferCounter > 0f && controller.isGrounded && !isJumping)
+                {
+                    isJumping = true;
+                    StartCoroutine(DelayedJump(0.5f)); // Adjust delay (e.g., 0.3 seconds)
+                }
+
+
+            }
+            else
+            {
+                // Retain forward momentum while airborne
+                if (Input.GetKey(KeyCode.W))
+                    horizontalMove = transform.forward * currentSpeed;
+            }
+
+            // Apply horizontal movement
+            moveDirection.x = horizontalMove.x;
+            moveDirection.z = horizontalMove.z;
+
+            // Apply gravity
+            moveDirection.y -= gravity * Time.deltaTime;
+
+            // Move the character
+            controller.Move(moveDirection * Time.deltaTime);
+        }
+        IEnumerator DelayedJump(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
+            moveDirection.y = jumpSpeed;
 
             if (Input.GetKey(KeyCode.W))
             {
-                moveDirection += transform.forward * currentSpeed * Time.deltaTime;
-            }
-            if (Input.GetKey(KeyCode.S))
-            {
-                moveDirection -= transform.forward * backSpeed * Time.deltaTime;
+                moveDirection += transform.forward * currentSpeed;
             }
 
-            moveDirection.y -= gravity * Time.deltaTime;
-            controller.Move(moveDirection);
+            jumpBufferCounter = 0f;
         }
+
+
+
 
         void HandleRotation()
         {
             float turn = 0f;
-            if (Input.GetKey(KeyCode.A))
+            if (Input.GetKey(KeyCode.A) && controller.isGrounded)
                 turn = -rotationSpeed;
-            if (Input.GetKey(KeyCode.D))
+            if (Input.GetKey(KeyCode.D) && controller.isGrounded)
                 turn = rotationSpeed;
 
             playerTrans.Rotate(0, turn * Time.deltaTime, 0);
@@ -75,8 +134,22 @@ namespace Player
 
         void HandleAnimation()
         {
+            if (Input.GetKeyDown(KeyCode.Space) && controller.isGrounded && !isWalkingBack && !isRotating)
+            {
+                animator.SetTrigger("jump");
+                animator.ResetTrigger("idle");
+                animator.ResetTrigger("walk");
+                animator.ResetTrigger("run");
+                animator.ResetTrigger("walkback");
+                animator.ResetTrigger("left");
+                animator.ResetTrigger("right");
+
+            }
+            
+
+
             // Walking Forward
-            if (Input.GetKeyDown(KeyCode.W))
+            if (Input.GetKeyDown(KeyCode.W) )
             {
                 animator.SetTrigger("walk");
                 animator.ResetTrigger("idle");
@@ -89,7 +162,7 @@ namespace Player
             {
                 animator.ResetTrigger("walk");
                 isWalking = false;
-                
+
                 // Only go to idle if not rotating
                 if (!isRotating)
                 {
@@ -98,7 +171,7 @@ namespace Player
             }
 
             // Walking Backward
-            if (Input.GetKeyDown(KeyCode.S))
+            if (Input.GetKeyDown(KeyCode.S) && controller.isGrounded)
             {
                 animator.SetTrigger("walkback");
                 animator.ResetTrigger("idle");
@@ -106,11 +179,11 @@ namespace Player
                 animator.ResetTrigger("right");
                 isWalkingBack = true;
             }
-            if (Input.GetKeyUp(KeyCode.S))
+            if (Input.GetKeyUp(KeyCode.S) && controller.isGrounded)
             {
                 animator.ResetTrigger("walkback");
                 isWalkingBack = false;
-                
+
                 if (!isRotating)
                 {
                     animator.SetTrigger("idle");
@@ -118,32 +191,32 @@ namespace Player
             }
 
             // Rotation Animations
-            if (Input.GetKey(KeyCode.A) && !isWalking && !isWalkingBack)
+            if (Input.GetKey(KeyCode.A) && !isWalking && !isWalkingBack && controller.isGrounded)
             {
                 animator.SetTrigger("left");
                 animator.ResetTrigger("idle");
                 animator.ResetTrigger("right");
             }
-            if (Input.GetKeyUp(KeyCode.A) && !isWalking && !isWalkingBack)
+            if (Input.GetKeyUp(KeyCode.A) && !isWalking && !isWalkingBack && controller.isGrounded)
             {
                 animator.ResetTrigger("left");
                 animator.SetTrigger("idle");
             }
 
-            if (Input.GetKey(KeyCode.D) && !isWalking && !isWalkingBack)
+            if (Input.GetKey(KeyCode.D) && !isWalking && !isWalkingBack && controller.isGrounded)
             {
                 animator.SetTrigger("right");
                 animator.ResetTrigger("idle");
                 animator.ResetTrigger("left");
             }
-            if (Input.GetKeyUp(KeyCode.D) && !isWalking && !isWalkingBack)
+            if (Input.GetKeyUp(KeyCode.D) && !isWalking && !isWalkingBack && controller.isGrounded)
             {
                 animator.ResetTrigger("right");
                 animator.SetTrigger("idle");
             }
 
             // Handle rotation while walking stops
-            if (isRotating && !isWalking && !isWalkingBack)
+            if (isRotating && !isWalking && !isWalkingBack && controller.isGrounded)
             {
                 if (Input.GetKey(KeyCode.A))
                 {
@@ -158,13 +231,13 @@ namespace Player
             }
 
             // Running (Shift)
-            if (isWalking && Input.GetKeyDown(KeyCode.LeftShift))
+            if (isWalking && Input.GetKeyDown(KeyCode.LeftShift) && controller.isGrounded)
             {
                 currentSpeed = walkSpeed + runBoost;
                 animator.SetTrigger("run");
                 animator.ResetTrigger("walk");
             }
-            if ((isWalking && Input.GetKeyUp(KeyCode.LeftShift)) || (!Input.GetKey(KeyCode.LeftShift) && isWalking))
+            if ((isWalking && Input.GetKeyUp(KeyCode.LeftShift) && controller.isGrounded) || (!Input.GetKey(KeyCode.LeftShift) && isWalking && controller.isGrounded))
             {
                 currentSpeed = walkSpeed;
                 animator.ResetTrigger("run");

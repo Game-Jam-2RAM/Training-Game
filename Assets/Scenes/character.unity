@@ -764,10 +764,8 @@ MonoBehaviour:
   walkSpeed: 5
   backSpeed: 5
   runBoost: 5
-  rotationSpeed: 110
-  jumpForce: 8
-  airControl: 0.5
-  allowDoubleJump: 0
+  rotationSpeed: 100
+  jumpSpeed: 8
 --- !u!1 &1897838534
 GameObject:
   m_ObjectHideFlags: 0
