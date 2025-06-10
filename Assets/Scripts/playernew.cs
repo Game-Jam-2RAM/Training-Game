@@ -28,12 +28,19 @@ namespace Player
         bool isRunning = false;
         bool isRotatingLeft = false;
         bool isRotatingRight = false;
+        AudioSource audioSource;
+        public AudioClip walkSound;
+        public AudioClip runSound;
+        public AudioClip walkBackSound;
+        public AudioClip jumping;
+
         void Start()
         {
             animator = GetComponent<Animator>();
             controller = GetComponent<CharacterController>();
             playerTrans = transform;
             currentSpeed = walkSpeed;
+            audioSource = GetComponent<AudioSource>();
         }
 
         void Update()
@@ -65,6 +72,24 @@ namespace Player
                 animator.ResetTrigger("jump"); // <- important
             }
         }
+        void PlaySound(AudioClip clip)
+        {
+            if (audioSource.clip == clip && audioSource.isPlaying)
+                return;
+        
+            audioSource.clip = clip;
+            if (clip == jumping)
+            {
+                audioSource.loop = false;
+                audioSource.Play();
+            }
+            else
+            {
+                audioSource.loop = true;
+                audioSource.Play();
+            }
+        }
+
 
         void HandleMovement()
         {
@@ -107,11 +132,13 @@ namespace Player
         {
             clearAnimationTriggers();
 
+
             // jump animation - trigger immediately when jumping starts
             if (isJumping || !controller.isGrounded)
             {
                 animator.SetTrigger("jump");
                 animator.ResetTrigger("idle");
+                PlaySound(jumping);
                 return;
             }
 
@@ -120,6 +147,7 @@ namespace Player
             {
                 animator.SetTrigger("run");
                 animator.ResetTrigger("idle");
+                PlaySound(runSound);
                 return;
             }
 
@@ -128,6 +156,7 @@ namespace Player
             {
                 animator.SetTrigger("walk");
                 animator.ResetTrigger("idle");
+                PlaySound(walkSound);
             }
 
             // walking backward
@@ -135,6 +164,14 @@ namespace Player
             {
                 animator.SetTrigger("walkback");
                 animator.ResetTrigger("idle");
+                PlaySound(walkBackSound);
+            }
+            else
+            {
+                if (audioSource.isPlaying)
+                {
+                    audioSource.Stop();
+                }
             }
 
             // Left Rotation
