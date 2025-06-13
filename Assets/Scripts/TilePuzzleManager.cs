@@ -12,8 +12,14 @@ public class TilePuzzleManager : MonoBehaviour
 
     public float lightUpTime = 2f;
     public float delayBeforePlayerMove = 2f;
+
     public Material normalMaterial;
-public Material lightMaterial;
+    public Material lightMaterial;
+    public Material correctTileMaterial; // Green
+    public Material wrongTileMaterial;   // Red
+
+    public GameObject entranceBarrier;   // Invisible wall to prevent early access
+
 
     void Start()
     {
@@ -71,20 +77,50 @@ public Material lightMaterial;
             TurnOffTile(i, correctPath[i]);
         }
 
-        Debug.Log("Player can start moving now.");
-        // After this you can enable player control
+        // Remove the invisible barrier
+        if (entranceBarrier != null)
+            entranceBarrier.SetActive(false);
     }
 
     void LightUpTile(int row, int column)
-{
-    Renderer rend = tiles[row, column].GetComponent<Renderer>();
-    rend.material = lightMaterial;
-}
+    {
+        Renderer rend = tiles[row, column].GetComponent<Renderer>();
+        rend.material = lightMaterial;
+    }
 
-void TurnOffTile(int row, int column)
-{
-    Renderer rend = tiles[row, column].GetComponent<Renderer>();
-    rend.material = normalMaterial;
-}
+    void TurnOffTile(int row, int column)
+    {
+        Renderer rend = tiles[row, column].GetComponent<Renderer>();
+        rend.material = normalMaterial;
+    }
 
+    // Call this when the player steps on a tile
+    public void PlayerSteppedOnTile(GameObject tile)
+    {
+
+        for (int row = 0; row < rows; row++)
+        {
+            for (int col = 0; col < columns; col++)
+            {
+                if (tiles[row, col] == tile)
+                {
+                    Renderer rend = tile.GetComponent<Renderer>();
+
+                    if (correctPath[row] == col)
+                    {
+                        rend.material = correctTileMaterial;
+                        Debug.Log("Correct tile!");
+                    }
+                    else
+                    {
+                        rend.material = wrongTileMaterial;
+                        Debug.Log("Wrong tile!");
+                        // Optionally trigger game over or reset here
+                    }
+
+                    return;
+                }
+            }
+        }
+    }
 }
