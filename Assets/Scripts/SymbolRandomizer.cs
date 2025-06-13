@@ -5,6 +5,8 @@ public class SymbolRandomizer : MonoBehaviour
 {
     public GameObject[] symbolPrefabs;     // Your symbol prefabs
     public Transform[] symbolPositions;    // Possible positions to place them
+    public Color keyColor = Color.yellow;  // The color for the key symbol
+    public int keySymbolIndex;             // Index
 
     void Start()
     {
@@ -13,6 +15,9 @@ public class SymbolRandomizer : MonoBehaviour
             Debug.LogError("The number of symbols and positions must match!");
             return;
         }
+
+        // Choose one random index to highlight
+        int keySymbolIndex = Random.Range(0, symbolPrefabs.Length);
 
         // Convert positions to a list we can shuffle
         List<Transform> shuffledPositions = new List<Transform>(symbolPositions);
@@ -25,9 +30,23 @@ public class SymbolRandomizer : MonoBehaviour
         }
 
         // Assign each symbol to a shuffled position
-        for (int i = 0; i < symbolPrefabs.Length; i++)
-        {
-            Instantiate(symbolPrefabs[i], shuffledPositions[i].position, shuffledPositions[i].rotation, transform);
-        }
-    }
+
+        GameObject symbolInstance = Instantiate(
+            symbolPrefabs[1],
+            shuffledPositions[1].position,
+            shuffledPositions[1].rotation,
+            transform);
+           
+
+            // // Highlight the chosen symbol
+            // if (i == keySymbolIndex)
+            // {
+            //     Renderer rend = symbolInstance.GetComponentInChildren<Renderer>();
+            //     if (rend != null)
+            //     {
+            //         rend.material.color = keyColor;
+            //     }
+            // }
+       // }
+    }
 }

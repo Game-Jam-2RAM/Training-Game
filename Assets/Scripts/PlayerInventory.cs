@@ -1,17 +1,41 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
+
 public class PlayerInventory : MonoBehaviour
-
-
 {
-    public int NumberOfDiamonds { get; private set; }
+    public int NumberOfDiamonds { get; private set; } = 0;
+    public InventoryUI inventoryUI; 
 
-    public UnityEvent<PlayerInventory> OnDiamondCollected;
     public void DiamondCollected()
     {
         NumberOfDiamonds++;
-        OnDiamondCollected?.Invoke(this);
+        Debug.Log("Diamond collected. Total: " + NumberOfDiamonds);
+
+        // Update UI
+        if (inventoryUI != null)
+        {
+            inventoryUI.UpdateDiamondText(this);
+        }
+        else
+        {
+            Debug.LogWarning("InventoryUI not assigned to PlayerInventory!");
+        }
+    }
+
+    public bool SpendDiamond(int amount)
+    {
+        if (NumberOfDiamonds >= amount)
+        {
+            NumberOfDiamonds -= amount;
+
+            // Update UI
+            if (inventoryUI != null)
+            {
+                inventoryUI.UpdateDiamondText(this);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }
