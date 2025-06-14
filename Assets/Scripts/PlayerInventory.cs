@@ -3,12 +3,35 @@ using UnityEngine;
 public class PlayerInventory : MonoBehaviour
 {
     public int NumberOfDiamonds { get; private set; } = 0;
-    public InventoryUI inventoryUI; 
+    public InventoryUI inventoryUI;
+
+    [Header("Audio Settings")]
+    public AudioClip collectSound; // Assign the sound clip in the Inspector
+    private AudioSource audioSource;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+    }
 
     public void DiamondCollected()
     {
         NumberOfDiamonds++;
         Debug.Log("Diamond collected. Total: " + NumberOfDiamonds);
+
+        // Play collection sound
+        if (collectSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(collectSound);
+        }
+        else
+        {
+            Debug.LogWarning("Collect sound or AudioSource not set.");
+        }
 
         // Update UI
         if (inventoryUI != null)
