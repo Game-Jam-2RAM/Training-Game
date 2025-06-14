@@ -1201,7 +1201,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dialogueManager: {fileID: 1912190136}
   linesToShow:
-  - its stage 1 here!
+  - " \u0645\u0631\u064A\u0645 \u0627\u0644\u0628\u062A\u0648\u0644 \u0641\u0631\u0627\u062D"
   - are you ready for the game ?
   - haaa?
 --- !u!1660057539 &9223372036854775807
