@@ -10,4 +10,9 @@ public class MainMenu : MonoBehaviour
     {
         GameController.Instance.QuitGame();
     }
+
+    public void OpenSettings()
+    {
+        GameController.Instance.ChangeScene("SettingsScene");
+    }
 }

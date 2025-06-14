@@ -12,7 +12,6 @@ public class GameController : MonoBehaviour
     public AudioSource musicSource;
     public AudioClip backgroundMusic;
     public int musicVolume = 100;
-
     private void Awake()
     {
         // Singleton logic
@@ -53,6 +52,7 @@ public class GameController : MonoBehaviour
 
     public void SetMusicVolume(int volume)
     {
+        musicVolume = volume;
         if (musicSource)
             musicSource.volume = volume / 100f;
     }
