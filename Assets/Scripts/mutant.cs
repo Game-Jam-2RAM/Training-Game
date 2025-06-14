@@ -30,7 +30,13 @@ public class mutant : MonoBehaviour
 
     void Update()
     {
-        if (player == null) return;
+        if (player == null || !player.gameObject.activeInHierarchy)
+        {
+            // set speed to 15
+            agent.speed = 15f;
+            agent.SetDestination(new Vector3(0.500000238f, -0.476415694f, 6.15999985f));
+            return;
+        }
 
         float distance = Vector3.Distance(transform.position, player.position);
 
