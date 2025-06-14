@@ -9,6 +9,7 @@ namespace Player
     {
         Animator animator;
         CharacterController controller;
+        public Transform enemyTransform;
         Transform playerTrans;
 
         Vector3 moveDirection = Vector3.zero;
@@ -19,15 +20,14 @@ namespace Player
         public float backSpeed = 5f;
         public float runBoost = 5f;
         public float rotationSpeed = 100f;
-        public float jumpSpeed = 3f;
         float currentSpeed;
         bool isWalkingForward = false;
         bool isWalkingBack = false;
         bool isRotating = false;
-        bool isJumping = false;
         bool isRunning = false;
         bool isRotatingLeft = false;
         bool isRotatingRight = false;
+        bool isAttacking = false;
         AudioSource audioSource;
         public AudioClip walkSound;
         public AudioClip runSound;
@@ -45,6 +45,8 @@ namespace Player
 
         void Update()
         {
+            float distanceToEnemy = Vector3.Distance(playerTrans.position, enemyTransform.position);
+            isAttacking = distanceToEnemy <= 8f;
             isWalkingForward = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
             isWalkingBack = controller.isGrounded && !Input.GetKey(KeyCode.Space)
                             && (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow));
@@ -57,20 +59,9 @@ namespace Player
             isRotating = controller.isGrounded && !Input.GetKey(KeyCode.Space) && (isRotatingLeft || isRotatingRight);
             isRotatingLeft &= isRotating;
             isRotatingRight &= isRotating;
-            if (!isJumping && Input.GetKeyDown(KeyCode.Space))
-            {
-                isJumping = true;
-            }
             HandleAnimation();
             HandleMovement();
             if (isRotating) HandleRotation();
-
-
-            if (isJumping && controller.isGrounded && moveDirection.y <= 0f)
-            {
-                isJumping = false;
-                animator.ResetTrigger("jump"); // <- important
-            }
         }
         void PlaySound(AudioClip clip)
         {
@@ -93,14 +84,6 @@ namespace Player
 
         void HandleMovement()
         {
-            // Jump
-            if (isJumping && controller.isGrounded)
-            {
-                moveDirection.y = jumpSpeed;
-                moveDirection += transform.forward * currentSpeed;
-                isJumping = false;
-            }
-
             Vector3 horizontalMove = transform.forward * currentSpeed;
             // Apply horizontal movement
             moveDirection.x = horizontalMove.x;
@@ -126,20 +109,16 @@ namespace Player
             animator.ResetTrigger("back");
             animator.ResetTrigger("left");
             animator.ResetTrigger("right");
-            animator.ResetTrigger("jump");
             animator.ResetTrigger("attack");
         }
         void HandleAnimation()
         {
             clearAnimationTriggers();
-
-
-            // jump animation - trigger immediately when jumping starts
-            if (isJumping || !controller.isGrounded)
+            if (isAttacking)
             {
-                animator.SetTrigger("jump");
+                animator.SetTrigger("attack");
                 animator.ResetTrigger("idle");
-                PlaySound(jumping);
+                PlaySound(jumping); // TODO: Replace with attack sound
                 return;
             }
 

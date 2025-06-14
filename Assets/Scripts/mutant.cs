@@ -32,9 +32,19 @@ public class mutant : MonoBehaviour
     {
         if (player == null || !player.gameObject.activeInHierarchy)
         {
-            // set speed to 15
-            agent.speed = 15f;
-            agent.SetDestination(new Vector3(0.500000238f, -0.476415694f, 6.15999985f));
+            float distance2 = Vector3.Distance(transform.position, new Vector3(0.500000238f, -0.476415694f, 6.15999985f));
+            if (distance2 > 0)
+            {
+                agent.SetDestination(new Vector3(0.500000238f, -0.476415694f, 6.15999985f));
+                agent.speed = 15f;
+            }
+            else
+            {
+                agent.ResetPath(); // stop moving
+                ResetAnimationTriggers();
+                animator.SetTrigger("idle");
+                isAttacking = false;
+            }
             return;
         }
 
