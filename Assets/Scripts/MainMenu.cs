@@ -8,8 +8,8 @@ public class MainMenu : MonoBehaviour
     //Start game
     public void Play()
     {
-       // SceneManager.LoadScene("SampleScene");
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        SceneManager.LoadScene("SampleScene");
+        // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         Debug.Log("Player has start the game.");
     }
     //Exit game
