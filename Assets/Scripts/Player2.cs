@@ -46,7 +46,7 @@ namespace Player
         void Update()
         {
             float distanceToEnemy = Vector3.Distance(playerTrans.position, enemyTransform.position);
-            isAttacking = distanceToEnemy <= 8f;
+            isAttacking = distanceToEnemy <= 18f;
             isWalkingForward = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
             isWalkingBack = controller.isGrounded && !Input.GetKey(KeyCode.Space)
                             && (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow));
@@ -119,6 +119,9 @@ namespace Player
                 animator.SetTrigger("attack");
                 animator.ResetTrigger("idle");
                 PlaySound(jumping); // TODO: Replace with attack sound
+                // wait 2.4 sec
+                Invoke(nameof(PerformAttack), 2.4f);
+                // StartCoroutine(WaitForAttackAnimation());
                 return;
             }
 
@@ -167,5 +170,17 @@ namespace Player
                 animator.ResetTrigger("idle");
             }
         }
+
+        private void PerformAttack()
+        {
+            isAttacking = false;
+        }
+
+        IEnumerator WaitForAttackAnimation()
+        {
+            yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
+            isAttacking = false;
+        }
+
     }
 }
