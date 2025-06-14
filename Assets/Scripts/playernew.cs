@@ -76,7 +76,7 @@ namespace Player
         {
             if (audioSource.clip == clip && audioSource.isPlaying)
                 return;
-        
+
             audioSource.clip = clip;
             if (clip == jumping)
             {
@@ -94,7 +94,7 @@ namespace Player
         void HandleMovement()
         {
             // Jump
-            if (isJumping)
+            if (isJumping && controller.isGrounded)
             {
                 moveDirection.y = jumpSpeed;
                 moveDirection += transform.forward * currentSpeed;
