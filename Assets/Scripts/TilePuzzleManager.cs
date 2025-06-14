@@ -11,22 +11,36 @@ public class TilePuzzleManager : MonoBehaviour
     private GameObject[,] tiles;
 
     public float lightUpTime = 2f;
-    public float delayBeforePlayerMove = 2f;
+    public float delayBeforePlayerMove = 3f;
 
     public Material normalMaterial;
     public Material lightMaterial;
     public Material correctTileMaterial; // Green
     public Material wrongTileMaterial;   // Red
+    public HealthScript health;
+    public AudioClip damageSound;
+    private AudioSource audioSource;
 
     public GameObject entranceBarrier;   // Invisible wall to prevent early access
 
+    // New damage variable:
+    public int wrongTileDamage = 10;
 
     void Start()
     {
         AssignTiles();
         GenerateRandomPath();
-        StartCoroutine(ShowCorrectPath());
+        //StartCoroutine(ShowCorrectPath());
+        if (health == null)
+            health = FindObjectOfType<HealthScript>();
+        audioSource = GetComponent<AudioSource>();
     }
+    public void StartPuzzle()
+{
+        
+    StartCoroutine(ShowCorrectPath());
+}
+
 
     void AssignTiles()
     {
@@ -68,8 +82,6 @@ public class TilePuzzleManager : MonoBehaviour
 
     IEnumerator ShowCorrectPath()
     {
-        yield return new WaitForSeconds(delayBeforePlayerMove);
-
         for (int i = 0; i < rows; i++)
         {
             LightUpTile(i, correctPath[i]);
@@ -97,7 +109,6 @@ public class TilePuzzleManager : MonoBehaviour
     // Call this when the player steps on a tile
     public void PlayerSteppedOnTile(GameObject tile)
     {
-
         for (int row = 0; row < rows; row++)
         {
             for (int col = 0; col < columns; col++)
@@ -115,7 +126,16 @@ public class TilePuzzleManager : MonoBehaviour
                     {
                         rend.material = wrongTileMaterial;
                         Debug.Log("Wrong tile!");
-                        // Optionally trigger game over or reset here
+
+                        // 💥 Damage the player here!
+                        if (health != null)
+                        {
+                            health.UpdateHealth(-wrongTileDamage);
+                            if (damageSound != null && audioSource != null)
+                    {
+                        audioSource.PlayOneShot(damageSound);
+                    }
+                        }
                     }
 
                     return;

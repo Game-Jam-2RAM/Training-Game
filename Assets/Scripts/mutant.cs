@@ -13,9 +13,14 @@ public class mutant : MonoBehaviour
     private float attackCooldown = 1.367f;
     private float lastAttackTime = 0f;
     private bool isAttacking = false;
+    public AudioClip damageSound;
+    public AudioClip scream;
+
+    private AudioSource audioSource;
 
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
 
@@ -23,7 +28,7 @@ public class mutant : MonoBehaviour
             health = FindObjectOfType<HealthScript>();
 
         gameObject.SetActive(false);
-        Invoke(nameof(ActivateMonster), 10f);
+        Invoke(nameof(ActivateMonster), 40f);
 
         agent.speed = 8f;
     }
@@ -58,6 +63,10 @@ public class mutant : MonoBehaviour
                 animator.SetTrigger("attack");
 
                 lastAttackTime = Time.time;
+                if (damageSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(scream);
+        }
 
                 StartCoroutine(WaitForAttackAnimation());
             }
@@ -74,6 +83,10 @@ public class mutant : MonoBehaviour
     private void PerformAttack()
     {
         health.UpdateHealth(-10);
+        if (damageSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(damageSound);
+        }
     }
 
     IEnumerator WaitForAttackAnimation()
