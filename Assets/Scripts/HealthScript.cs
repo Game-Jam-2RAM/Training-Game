@@ -18,6 +18,8 @@ public class HealthScript : MonoBehaviour
     public void UpdateHealth(float healthDifference)
     {
         slider.value += healthDifference; // Update the health bar value
+        if (slider.value <= 0)
+            GameController.Instance.ChangeScene("FinalStageMenu");
         Debug.Log("Health updated by " + healthDifference + ". Current health: " + slider.value);
     }
 

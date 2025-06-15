@@ -28,7 +28,7 @@ public class mutant : MonoBehaviour
             health = FindObjectOfType<HealthScript>();
 
         gameObject.SetActive(false);
-        Invoke(nameof(ActivateMonster), 40f);
+        Invoke(nameof(ActivateMonster), 50f);
 
         agent.speed = 8f;
     }
@@ -80,9 +80,9 @@ public class mutant : MonoBehaviour
 
                 lastAttackTime = Time.time;
                 if (damageSound != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(scream);
-        }
+                {
+                    audioSource.PlayOneShot(scream);
+                }
 
                 StartCoroutine(WaitForAttackAnimation());
             }
